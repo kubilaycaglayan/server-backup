@@ -28,7 +28,7 @@ chown root:"$(id -gn "$BACKUP_USER")" "$log_file"
 chmod 0640 "$log_file"
 exec > >(tee -a "$log_file") 2>&1
 
-staging_dir="$STAGING_ROOT/$run_id"
+staging_dir="$STAGING_ROOT/current"
 cleanup() {
   local status=$?
   rm -rf -- "$staging_dir"
@@ -129,7 +129,7 @@ if [[ "$dry_run" == "false" ]]; then
   log INFO "Verified $dump_count PostgreSQL dump(s) and system inventory in the snapshot"
 
   log INFO "Applying retention policy: $KEEP_WEEKLY weekly snapshots"
-  restic forget --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
+  restic forget --group-by host --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
 else
   log INFO "Dry-run complete; no snapshot or retention changes were made"
 fi

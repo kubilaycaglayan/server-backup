@@ -44,6 +44,10 @@ After each real backup, the workflow reads every compressed PostgreSQL dump and
 the package inventory back from the new Restic snapshot. A missing or corrupt
 artifact makes the run fail before retention is applied.
 
+Snapshots are grouped by host for retention, so changing source details cannot
+strand snapshots outside the four-week policy. Runtime staging uses a stable
+path to allow Restic to select parent snapshots efficiently.
+
 Backup logs are readable by the configured backup user's primary group. The
 temporary staging directory is group-traversable but dump files remain
 root-only under the project's restrictive umask.
