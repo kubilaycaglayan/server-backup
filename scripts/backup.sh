@@ -15,6 +15,9 @@ rotate_logs
 
 run_id="$(date -u +%Y%m%dT%H%M%SZ)"
 log_file="$LOG_DIR/backup-$run_id.log"
+touch "$log_file"
+chown root:"$(id -gn "$BACKUP_USER")" "$log_file"
+chmod 0640 "$log_file"
 exec > >(tee -a "$log_file") 2>&1
 
 staging_dir="$STAGING_ROOT/$run_id"
@@ -70,10 +73,25 @@ for source_path in "${sources[@]}"; do
   fi
 done
 
+# Raw PostgreSQL data directories are not transactionally safe to copy while
+# live. Their online logical dumps above are the authoritative backup.
+postgres_excludes=()
+while IFS= read -r container; do
+  if docker exec "$container" sh -c 'test "$(cat /proc/1/comm)" = postgres' >/dev/null 2>&1; then
+    while IFS= read -r volume_path; do
+      if [[ -n "$volume_path" ]]; then
+        postgres_excludes+=(--exclude "$volume_path")
+        log INFO "Excluding live PostgreSQL data directory: $volume_path"
+      fi
+    done < <(docker inspect --format '{{range .Mounts}}{{if eq .Destination "/var/lib/postgresql/data"}}{{println .Source}}{{end}}{{end}}' "$container")
+  fi
+done < <(docker ps --format '{{.Names}}')
+
 log INFO "Creating encrypted Restic snapshot"
 restic backup \
   --exclude-file "$PROJECT_DIR/config/excludes.txt" \
   --exclude "$RESTIC_REPOSITORY" \
+  "${postgres_excludes[@]}" \
   --tag "${BACKUP_TRIGGER:-manual}" \
   --host "$(hostname)" \
   "${existing_sources[@]}"

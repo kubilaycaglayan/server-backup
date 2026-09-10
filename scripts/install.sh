@@ -17,7 +17,8 @@ calendar="${BACKUP_CALENDAR:-Sun *-*-* 02:00:00}"
 timezone="${BACKUP_TIMEZONE:-Etc/GMT-3}"
 systemd-analyze calendar "$calendar $timezone" >/dev/null
 
-install -d -m 0700 -o root -g root "$LOG_DIR" "$STAGING_ROOT"
+backup_group="$(id -gn "$BACKUP_USER")"
+install -d -m 0750 -o root -g "$backup_group" "$LOG_DIR" "$STAGING_ROOT"
 chown root:root "$ENV_FILE"
 chmod 0600 "$ENV_FILE"
 find "$SCRIPT_DIR" -maxdepth 1 -type f -name '*.sh' -exec chmod 0755 {} +

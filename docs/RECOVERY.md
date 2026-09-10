@@ -27,8 +27,11 @@ sudo mkdir -p /srv/server-restore
 sudo scripts/restore.sh latest /srv/server-restore
 ```
 
-Database dumps are found under the restored staging tree. Inspect each dump
-with `pg_restore --list` before restoring it. Database ownership, roles, and
-credentials are application-specific and must be recreated from the relevant
+Database dumps are found under the restored staging tree. Validate one with
+`gzip -t dump.sql.gz`, inspect it with `zless`, and restore it with a command
+such as `gzip -dc dump.sql.gz | psql`. Database ownership, roles, and
+credentials are application-specific and must be reconciled with the relevant
 deployment configuration.
 
+PostgreSQL raw volume directories are intentionally absent because a live file
+copy is not transactionally reliable. Use the compressed logical SQL dumps.

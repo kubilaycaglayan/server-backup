@@ -30,3 +30,10 @@ are evaluated against full source paths and directory names.
 
 Missing optional paths are skipped and recorded in the log.
 
+Running PostgreSQL containers are handled specially: logical dumps are made
+online, and their raw live data directories are excluded from the filesystem
+snapshot. Other Docker volume files are copied live.
+
+Backup logs are readable by the configured backup user's primary group. The
+temporary staging directory is group-traversable but dump files remain
+root-only under the project's restrictive umask.
