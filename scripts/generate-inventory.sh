@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=common.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common.sh"
 
 require_root
@@ -34,4 +34,3 @@ find "$BACKUP_USER_HOME" -maxdepth 5 -type f \
   -print >"$OUTPUT_DIR/compose-files.txt" 2>/dev/null || true
 
 log INFO "System inventory created at $OUTPUT_DIR"
-

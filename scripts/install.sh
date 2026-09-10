@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=common.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common.sh"
 
 require_root
@@ -37,4 +37,3 @@ systemctl enable --now server-backup.timer
 
 log INFO "Installed server-backup timer. The first backup remains manual."
 systemctl list-timers server-backup.timer --no-pager
-

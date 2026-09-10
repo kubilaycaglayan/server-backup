@@ -7,6 +7,8 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 PROJECT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd -P)"
 ENV_FILE="$PROJECT_DIR/.env"
 LOG_DIR="$PROJECT_DIR/logs"
+# Consumed by scripts that source this file.
+# shellcheck disable=SC2034
 STAGING_ROOT="$PROJECT_DIR/staging"
 LOCK_FILE="/run/lock/server-backup.lock"
 
@@ -76,4 +78,3 @@ rotate_logs() {
   mkdir -p "$LOG_DIR"
   find "$LOG_DIR" -maxdepth 1 -type f -name '*.log' -mtime "+${LOG_RETENTION_DAYS:-28}" -delete
 }
-

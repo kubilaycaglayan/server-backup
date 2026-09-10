@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=common.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common.sh"
 
 require_root
@@ -26,4 +26,3 @@ destination="${2:-}"
 log INFO "Restoring snapshot $snapshot into $destination"
 restic restore "$snapshot" --target "$destination"
 log INFO "Restore extraction completed; review files before copying them into place."
-

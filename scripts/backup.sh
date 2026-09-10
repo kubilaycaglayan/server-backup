@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=common.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common.sh"
 
 require_root
@@ -82,4 +82,3 @@ log INFO "Applying retention policy: $KEEP_WEEKLY weekly snapshots"
 restic forget --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
 
 "$SCRIPT_DIR/check-repository.sh"
-

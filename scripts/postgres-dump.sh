@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
-# shellcheck source=common.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/common.sh"
 
 require_root
@@ -19,7 +19,11 @@ if [[ -n "${POSTGRES_CONTAINERS:-}" ]]; then
   read -r -a containers <<<"$POSTGRES_CONTAINERS"
 else
   while IFS= read -r container; do
-    if docker exec "$container" sh -c 'pg_isready -U "${POSTGRES_USER:-postgres}"' >/dev/null 2>&1; then
+    # A sidecar may contain pg_isready and reach a remote database. Requiring
+    # postgres as PID 1 identifies the actual official-style DB containers.
+    if docker exec "$container" sh -c \
+      'test "$(cat /proc/1/comm)" = postgres && pg_isready -U "${POSTGRES_USER:-postgres}"' \
+      >/dev/null 2>&1; then
       containers+=("$container")
     fi
   done < <(docker ps --format '{{.Names}}')
@@ -47,4 +51,3 @@ if [[ "$dump_count" -eq 0 && "${REQUIRE_POSTGRES_DUMPS:-false}" == "true" ]]; th
 fi
 
 log INFO "Created $dump_count PostgreSQL dump(s) at $OUTPUT_DIR"
-
