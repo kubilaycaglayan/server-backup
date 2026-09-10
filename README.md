@@ -35,10 +35,10 @@ before relying on the backup.
 
 ```bash
 sudo ./scripts/backup.sh             # backup on demand
+sudo ./scripts/backup.sh --dry-run   # validate scope without a snapshot
 sudo ./scripts/check-repository.sh   # explicit repository check
 sudo ./scripts/restore.sh snapshots  # list snapshots
 sudo ./scripts/restore.sh latest /safe/restore/directory
 ```
 
 Runtime logs are written to `logs/` and retained for 28 days by default.
-

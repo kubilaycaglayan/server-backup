@@ -10,6 +10,14 @@ require_root
 load_config
 require_commands restic mountpoint gzip docker
 acquire_lock
+
+dry_run=false
+case "${1:-}" in
+  "") ;;
+  --dry-run) dry_run=true ;;
+  *) die "Usage: backup.sh [--dry-run]" ;;
+esac
+
 mkdir -p "$LOG_DIR" "$STAGING_ROOT"
 rotate_logs
 
@@ -33,7 +41,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-log INFO "Starting ${BACKUP_TRIGGER:-manual} backup"
+log INFO "Starting ${BACKUP_TRIGGER:-manual} backup (dry-run=$dry_run)"
 require_backup_mount
 mkdir -p "$RESTIC_REPOSITORY" "$staging_dir/inventory" "$staging_dir/postgresql"
 
@@ -88,7 +96,12 @@ while IFS= read -r container; do
 done < <(docker ps --format '{{.Names}}')
 
 log INFO "Creating encrypted Restic snapshot"
+restic_options=()
+if [[ "$dry_run" == "true" ]]; then
+  restic_options+=(--dry-run)
+fi
 restic backup \
+  "${restic_options[@]}" \
   --exclude-file "$PROJECT_DIR/config/excludes.txt" \
   --exclude "$RESTIC_REPOSITORY" \
   "${postgres_excludes[@]}" \
@@ -96,7 +109,11 @@ restic backup \
   --host "$(hostname)" \
   "${existing_sources[@]}"
 
-log INFO "Applying retention policy: $KEEP_WEEKLY weekly snapshots"
-restic forget --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
+if [[ "$dry_run" == "false" ]]; then
+  log INFO "Applying retention policy: $KEEP_WEEKLY weekly snapshots"
+  restic forget --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
+else
+  log INFO "Dry-run complete; no snapshot or retention changes were made"
+fi
 
 "$SCRIPT_DIR/check-repository.sh"
