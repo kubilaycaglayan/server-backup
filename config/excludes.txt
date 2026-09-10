@@ -1,0 +1,54 @@
+# Virtual/runtime filesystems
+/dev
+/proc
+/run
+/sys
+/tmp
+/var/tmp
+
+# Backup runtime and destination (repository is also excluded dynamically)
+/opt/server-backup/.git
+/opt/server-backup/logs
+/opt/server-backup/staging
+
+# System data that is regenerated or downloaded
+/var/cache
+/var/log
+/var/lib/docker/buildkit
+/var/lib/docker/containerd
+/var/lib/docker/image
+/var/lib/docker/overlay2
+
+# User caches and downloadable developer tooling
+**/.cache
+**/.gradle
+**/.npm
+**/.yarn/cache
+**/.m2/repository
+**/.vscode-server
+**/.sdkman
+**/.nvm
+**/.rbenv
+**/.pyenv/versions
+**/node_modules
+**/.venv
+**/venv
+**/venvs
+**/__pycache__
+
+# SSH private keys. Public keys, config, known_hosts and authorized_keys remain.
+**/.ssh/id_rsa
+**/.ssh/id_rsa_*
+**/.ssh/id_dsa
+**/.ssh/id_dsa_*
+**/.ssh/id_ecdsa
+**/.ssh/id_ecdsa_*
+**/.ssh/id_ed25519
+**/.ssh/id_ed25519_*
+**/.ssh/*.pem
+**/.ssh/*.key
+
+# Explicitly downloadable large application data
+**/ollama
+**/jetbrains-cache
+

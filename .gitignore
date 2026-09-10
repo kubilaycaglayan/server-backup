@@ -1,0 +1,10 @@
+.env
+logs/*
+!logs/.gitkeep
+staging/*
+!staging/.gitkeep
+*.dump
+*.dump.gz
+*.dump.zst
+*.log
+
