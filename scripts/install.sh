@@ -22,6 +22,12 @@ systemd-analyze calendar "$calendar $timezone" >/dev/null
 
 backup_group="$(id -gn "$BACKUP_USER")"
 install -d -m 0750 -o root -g "$backup_group" "$LOG_DIR" "$STAGING_ROOT"
+chmod 0640 "$ENV_FILE"
+if command -v setfacl >/dev/null 2>&1; then
+  setfacl -m "u:$BACKUP_USER:r,m:r,g::---,o::---" "$ENV_FILE"
+else
+  die "setfacl is required to let $BACKUP_USER read .env from VS Code."
+fi
 find "$SCRIPT_DIR" -maxdepth 1 -type f -name '*.sh' -exec chmod 0755 {} +
 
 install -m 0644 "$PROJECT_DIR/systemd/server-backup.service" /etc/systemd/system/server-backup.service

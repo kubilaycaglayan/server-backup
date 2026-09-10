@@ -34,7 +34,13 @@ load_config() {
 
   local mode
   mode="$(stat -c '%a' "$ENV_FILE")"
-  [[ "$mode" == "600" || "$mode" == "400" ]] || die "$ENV_FILE must have mode 0600 or 0400 (current: $mode)."
+  [[ "$mode" == "600" || "$mode" == "400" || "$mode" == "640" || "$mode" == "440" ]] || \
+    die "$ENV_FILE must have mode 0600/0400, or 0640/0440 with a user-only read ACL (current: $mode)."
+
+  if command -v getfacl >/dev/null 2>&1; then
+    getfacl -cp "$ENV_FILE" | grep -q '^other::---$' || die "$ENV_FILE must deny access to other users."
+    getfacl -cp "$ENV_FILE" | grep -q '^group::---$' || die "$ENV_FILE must deny access to its owning group."
+  fi
 
   set -a
   # shellcheck disable=SC1090

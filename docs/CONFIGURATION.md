@@ -1,7 +1,8 @@
 # Configuration
 
 Install `.env.example` as `.env`, then customize it. The local file is ignored
-by Git and is normalized to root ownership with mode `0600` by the installer.
+by Git, owned by root, and the installer grants only the configured backup user
+read access through a filesystem ACL so it can be viewed in VS Code.
 
 ```bash
 sudo install -m 0600 -o root -g root .env.example .env
