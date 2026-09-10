@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly encrypted server backup
+
+[Timer]
+OnCalendar=@BACKUP_CALENDAR@ @BACKUP_TIMEZONE@
+Persistent=true
+RandomizedDelaySec=5m
+Unit=server-backup.service
+
+[Install]
+WantedBy=timers.target
+
