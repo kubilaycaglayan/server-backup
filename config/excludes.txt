@@ -9,7 +9,6 @@
 # Backup runtime and destination (repository is also excluded dynamically)
 /opt/server-backup/.git
 /opt/server-backup/logs
-/opt/server-backup/staging
 
 # System data that is regenerated or downloaded
 /var/cache
@@ -51,4 +50,3 @@
 # Explicitly downloadable large application data
 **/ollama
 **/jetbrains-cache
-

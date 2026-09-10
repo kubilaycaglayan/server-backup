@@ -110,6 +110,24 @@ restic backup \
   "${existing_sources[@]}"
 
 if [[ "$dry_run" == "false" ]]; then
+  log INFO "Verifying database dumps and inventory in the new snapshot"
+  dump_count=0
+  while IFS= read -r -d '' dump_file; do
+    if ! restic dump latest "$dump_file" | gzip -t; then
+      die "Backed-up PostgreSQL dump could not be verified: $dump_file"
+    fi
+    ((dump_count += 1))
+  done < <(find "$staging_dir/postgresql" -maxdepth 1 -type f -name '*.sql.gz' -print0)
+
+  if [[ "$dump_count" -eq 0 && "${REQUIRE_POSTGRES_DUMPS:-false}" == "true" ]]; then
+    die "No PostgreSQL dumps were found in the new snapshot."
+  fi
+
+  if ! restic dump latest "$staging_dir/inventory/dpkg-packages.tsv" >/dev/null; then
+    die "System inventory was not found in the new snapshot."
+  fi
+  log INFO "Verified $dump_count PostgreSQL dump(s) and system inventory in the snapshot"
+
   log INFO "Applying retention policy: $KEEP_WEEKLY weekly snapshots"
   restic forget --keep-weekly "$KEEP_WEEKLY" --keep-last 1 --prune
 else

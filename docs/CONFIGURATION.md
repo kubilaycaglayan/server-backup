@@ -40,6 +40,10 @@ Running PostgreSQL containers are handled specially: logical dumps are made
 online, and their raw live data directories are excluded from the filesystem
 snapshot. Other Docker volume files are copied live.
 
+After each real backup, the workflow reads every compressed PostgreSQL dump and
+the package inventory back from the new Restic snapshot. A missing or corrupt
+artifact makes the run fail before retention is applied.
+
 Backup logs are readable by the configured backup user's primary group. The
 temporary staging directory is group-traversable but dump files remain
 root-only under the project's restrictive umask.
