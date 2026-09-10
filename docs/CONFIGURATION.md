@@ -1,7 +1,12 @@
 # Configuration
 
-Copy `.env.example` to `.env`. The local file is ignored by Git and must be
-owned by root with mode `0600` after installation.
+Install `.env.example` as `.env`, then customize it. The local file is ignored
+by Git and is normalized to root ownership with mode `0600` by the installer.
+
+```bash
+sudo install -m 0600 -o root -g root .env.example .env
+sudo editor .env
+```
 
 Required values:
 

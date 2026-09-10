@@ -7,6 +7,9 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 source "$SCRIPT_DIR/common.sh"
 
 require_root
+[[ -f "$ENV_FILE" ]] || die "Missing $ENV_FILE; copy .env.example and customize it."
+chown root:root "$ENV_FILE"
+chmod 0600 "$ENV_FILE"
 load_config
 require_commands restic systemctl systemd-analyze sed install
 
@@ -19,8 +22,6 @@ systemd-analyze calendar "$calendar $timezone" >/dev/null
 
 backup_group="$(id -gn "$BACKUP_USER")"
 install -d -m 0750 -o root -g "$backup_group" "$LOG_DIR" "$STAGING_ROOT"
-chown root:root "$ENV_FILE"
-chmod 0600 "$ENV_FILE"
 find "$SCRIPT_DIR" -maxdepth 1 -type f -name '*.sh' -exec chmod 0755 {} +
 
 install -m 0644 "$PROJECT_DIR/systemd/server-backup.service" /etc/systemd/system/server-backup.service

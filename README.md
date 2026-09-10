@@ -22,7 +22,7 @@ a backup immediately.
 ## Quick start
 
 ```bash
-cp .env.example .env
+sudo install -m 0600 -o root -g root .env.example .env
 sudo editor .env
 sudo ./scripts/install.sh
 sudo ./scripts/backup.sh
